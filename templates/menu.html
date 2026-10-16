@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Menu Management - FoodCycle{% endblock %}
+
+{% block content %}
+<div class="grid-aside">
+  <!-- Sidebar -->
+  <aside class="portal-sidebar">
+    <div style="margin-bottom: 1.25rem;">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-forest);">{{ current_user.org_name }}</h3>
+      <span class="badge badge-forest" style="font-size: 0.72rem; margin-top: 0.25rem;">
+        <i data-lucide="chef-hat"></i> Commercial Kitchen
+      </span>
+    </div>
+
+    <div class="portal-nav-title">Management</div>
+    <ul class="portal-nav-list">
+      <li class="portal-nav-item"><a href="/restaurant/dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/forecast"><i data-lucide="sparkles"></i> Demand Forecast</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/surplus"><i data-lucide="package-plus"></i> Surplus Listings</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/requests"><i data-lucide="inbox"></i> NGO Requests</a></li>
+      <li class="portal-nav-item active"><a href="/restaurant/menu"><i data-lucide="utensils"></i> Menu Items</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/sales"><i data-lucide="history"></i> Sales & Prep Log</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/profile"><i data-lucide="settings"></i> Kitchen Profile</a></li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <section>
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+      <div>
+        <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--color-dark);">Menu Catalog</h1>
+        <p style="font-size: 0.92rem; color: var(--color-muted);">
+          Active menu items are tracked by our machine learning demand predictor.
+        </p>
+      </div>
+
+      <button type="button" class="btn btn-primary" onclick="openModal('addDishModal')">
+        <i data-lucide="plus-circle"></i> Add New Dish
+      </button>
+    </div>
+
+    <!-- Dishes Table -->
+    <div class="card">
+      {% if menu_items %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Dish Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Serving Size</th>
+                <th>Dietary & Allergens</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in menu_items %}
+                <tr>
+                  <td>
+                    <strong>{{ item.dish_name }}</strong>
+                  </td>
+                  <td>{{ item.category }}</td>
+                  <td>₹{{ "%.2f"|format(item.price) }}</td>
+                  <td>{{ item.serving_size }}</td>
+                  <td>
+                    {% if item.is_vegetarian %}
+                      <span class="badge badge-veg"><i data-lucide="leaf"></i> Veg</span>
+                    {% else %}
+                      <span class="badge badge-nonveg"><i data-lucide="flame"></i> Non-Veg</span>
+                    {% endif %}
+                    {% if item.allergens %}
+                      <div style="font-size: 0.75rem; color: var(--color-muted); margin-top: 0.2rem;">
+                        Contains: {{ item.allergens|join(', ') }}
+                      </div>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if item.is_active %}
+                      <span class="badge badge-forest">Active</span>
+                    {% else %}
+                      <span class="badge badge-earth">Archived</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div style="display: flex; gap: 0.4rem;">
+                      <form action="/restaurant/menu/{{ item._id }}/toggle" method="POST" style="margin: 0;">
+                        <button type="submit" class="btn btn-secondary btn-sm" title="Toggle active status">
+                          {% if item.is_active %}Deactivate{% else %}Activate{% endif %}
+                        </button>
+                      </form>
+                      <form action="/restaurant/menu/{{ item._id }}/delete" method="POST" onsubmit="return confirm('Delete this menu item?');" style="margin: 0;">
+                        <button type="submit" class="btn btn-danger btn-sm" title="Delete">
+                          <i data-lucide="trash-2"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon"><i data-lucide="utensils"></i></div>
+          <h3 class="empty-title">Your menu is currently empty</h3>
+          <p class="empty-desc">Add your restaurant's dishes to start tracking historical demand and generating forecasts.</p>
+          <button type="button" class="btn btn-primary" onclick="openModal('addDishModal')">
+            <i data-lucide="plus"></i> Add First Dish
+          </button>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+
+<!-- Add Dish Modal -->
+<div id="addDishModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--color-dark);">Add New Menu Item</h3>
+      <button type="button" class="modal-close" onclick="closeModal('addDishModal')">&times;</button>
+    </div>
+
+    <form action="/restaurant/menu" method="POST">
+      <div class="form-group">
+        <label class="form-label">Dish Name</label>
+        <input type="text" name="dish_name" class="form-control" placeholder="e.g. Paneer Tikka Masala" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select name="category" class="form-control">
+            <option value="Main Course">Main Course</option>
+            <option value="Rice & Biryani">Rice & Biryani</option>
+            <option value="Appetizers">Appetizers</option>
+            <option value="Breads">Breads</option>
+            <option value="Dessert">Dessert</option>
+            <option value="Beverage">Beverage</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Price (₹)</label>
+          <input type="number" step="0.5" name="price" class="form-control" placeholder="250.00" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Serving Size</label>
+          <input type="text" name="serving_size" class="form-control" value="1 portion (~400g)">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Classification</label>
+          <select name="is_vegetarian" class="form-control">
+            <option value="true">Vegetarian</option>
+            <option value="false">Non-Vegetarian</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Declared Allergens (comma separated)</label>
+        <input type="text" name="allergens_raw" class="form-control" placeholder="Dairy, Nuts, Gluten">
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('addDishModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary"><i data-lucide="check"></i> Save Dish</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

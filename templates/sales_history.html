@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Sales & Prep Log - FoodCycle{% endblock %}
+
+{% block content %}
+<div class="grid-aside">
+  <!-- Sidebar -->
+  <aside class="portal-sidebar">
+    <div style="margin-bottom: 1.25rem;">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-forest);">{{ current_user.org_name }}</h3>
+      <span class="badge badge-forest" style="font-size: 0.72rem; margin-top: 0.25rem;">
+        <i data-lucide="chef-hat"></i> Commercial Kitchen
+      </span>
+    </div>
+
+    <div class="portal-nav-title">Management</div>
+    <ul class="portal-nav-list">
+      <li class="portal-nav-item"><a href="/restaurant/dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/forecast"><i data-lucide="sparkles"></i> Demand Forecast</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/surplus"><i data-lucide="package-plus"></i> Surplus Listings</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/requests"><i data-lucide="inbox"></i> NGO Requests</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/menu"><i data-lucide="utensils"></i> Menu Items</a></li>
+      <li class="portal-nav-item active"><a href="/restaurant/sales"><i data-lucide="history"></i> Sales & Prep Log</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/profile"><i data-lucide="settings"></i> Kitchen Profile</a></li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <section>
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--color-dark);">Sales & Kitchen Prep History</h1>
+        <p style="font-size: 0.92rem; color: var(--color-muted);">
+          Actual daily sales feed the Scikit-Learn training pipeline for chronological demand forecasting.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem;">
+        <button type="button" class="btn btn-primary" onclick="openModal('recordSalesModal')">
+          <i data-lucide="plus"></i> Record Daily Prep & Sales
+        </button>
+      </div>
+    </div>
+
+    <!-- History Stats Banner -->
+    <div class="grid-3" style="margin-bottom: 1.5rem;">
+      <div class="kpi-card">
+        <div class="kpi-icon forest"><i data-lucide="database"></i></div>
+        <div class="kpi-content">
+          <h4>Logged Entries</h4>
+          <div class="kpi-value">{{ total_count }}</div>
+          <div class="kpi-subtext">Historical daily dish observations</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon leaf"><i data-lucide="check-circle-2"></i></div>
+        <div class="kpi-content">
+          <h4>ML Model Readiness</h4>
+          <div class="kpi-value">{% if total_count >= 14 %}Ready (ML Active){% else %}Collecting Data{% endif %}</div>
+          <div class="kpi-subtext">Minimum 14 days required for Random Forest</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon earth"><i data-lucide="sparkles"></i></div>
+        <div class="kpi-content">
+          <h4>Sample Demonstrator</h4>
+          <div class="kpi-value">Realistic 90-Day Trend</div>
+          <div class="kpi-subtext">Includes weekend surges & Indian festivals</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sales Table -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><i data-lucide="list"></i> Recent Daily Records</h3>
+        <span class="badge badge-forest">Chronological Sort</span>
+      </div>
+
+      {% if sales_records %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Dish Name</th>
+                <th>Qty Sold</th>
+                <th>Qty Prepared</th>
+                <th>Actual Leftover</th>
+                <th>Special Event / Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for rec in sales_records %}
+                <tr>
+                  <td><strong>{{ rec.date }}</strong></td>
+                  <td>{{ rec.dish_name }}</td>
+                  <td><span class="badge badge-forest">{{ rec.quantity_sold }} servings</span></td>
+                  <td>{{ rec.quantity_produced }} servings</td>
+                  <td>
+                    {% if rec.leftover_quantity > 0 %}
+                      <span class="badge badge-warning">{{ rec.leftover_quantity }} surplus</span>
+                    {% else %}
+                      <span class="badge badge-leaf">Zero Waste</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if rec.special_event %}
+                      <span class="badge badge-earth"><i data-lucide="sparkles"></i> {{ rec.special_event }}</span>
+                    {% else %}
+                      <span style="color: var(--color-muted); font-size: 0.8rem;">Regular Service</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon"><i data-lucide="file-plus"></i></div>
+          <h3 class="empty-title">No daily sales logged yet</h3>
+          <p class="empty-desc">Record your first daily sales and leftovers to initialize the AI engine.</p>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+
+<!-- Record Sales Modal -->
+<div id="recordSalesModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--color-dark);">Record Daily Kitchen Prep & Sales</h3>
+      <button type="button" class="modal-close" onclick="closeModal('recordSalesModal')">&times;</button>
+    </div>
+
+    <form action="/restaurant/sales" method="POST">
+      <div class="form-group">
+        <label class="form-label">Select Menu Item</label>
+        <select name="dish_id" class="form-control" required>
+          {% for item in menu_items %}
+            <option value="{{ item._id }}">{{ item.dish_name }} ({{ item.category }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Service Date</label>
+        <input type="date" name="date" class="form-control" value="{{ today_str }}" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Quantity Sold (Servings)</label>
+          <input type="number" name="quantity_sold" class="form-control" placeholder="45" min="0" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Quantity Produced (Servings)</label>
+          <input type="number" name="quantity_produced" class="form-control" placeholder="50" min="0" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Leftover Quantity (Servings)</label>
+          <input type="number" name="leftover_quantity" class="form-control" placeholder="5" min="0" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Special Event / Festival (Optional)</label>
+          <input type="text" name="special_event" class="form-control" placeholder="e.g. Diwali Weekend, Live Music">
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('recordSalesModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Save Daily Record</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

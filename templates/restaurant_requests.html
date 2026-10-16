@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}NGO Donation Requests - FoodCycle{% endblock %}
+
+{% block content %}
+<div class="grid-aside">
+  <!-- Sidebar -->
+  <aside class="portal-sidebar">
+    <div style="margin-bottom: 1.25rem;">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-forest);">{{ current_user.org_name }}</h3>
+      <span class="badge badge-forest" style="font-size: 0.72rem; margin-top: 0.25rem;">
+        <i data-lucide="chef-hat"></i> Commercial Kitchen
+      </span>
+    </div>
+
+    <div class="portal-nav-title">Management</div>
+    <ul class="portal-nav-list">
+      <li class="portal-nav-item"><a href="/restaurant/dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/forecast"><i data-lucide="sparkles"></i> Demand Forecast</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/surplus"><i data-lucide="package-plus"></i> Surplus Listings</a></li>
+      <li class="portal-nav-item active"><a href="/restaurant/requests"><i data-lucide="inbox"></i> NGO Requests</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/menu"><i data-lucide="utensils"></i> Menu Items</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/sales"><i data-lucide="history"></i> Sales & Prep Log</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/profile"><i data-lucide="settings"></i> Kitchen Profile</a></li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <section>
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--color-dark);">NGO Donation Requests</h1>
+        <p style="font-size: 0.92rem; color: var(--color-muted);">
+          Review, approve, and track pickups for surplus food requested by registered NGOs.
+        </p>
+      </div>
+
+      <span class="badge badge-forest"><i data-lucide="lock"></i> Atomic Concurrency Protected</span>
+    </div>
+
+    {% if requests_list %}
+      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        {% for req in requests_list %}
+          <div class="card" style="border-left: 4px solid {% if req.status == 'Approved' %}var(--color-leaf){% elif req.status == 'Requested' %}var(--color-warning){% elif req.status == 'Completed' %}var(--color-forest){% else %}var(--color-muted){% endif %};">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
+              <div>
+                <span class="badge badge-earth" style="margin-bottom: 0.35rem;">Request #{{ req._id }}</span>
+                <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--color-dark);">
+                  {{ req.requested_quantity }} Servings of {{ req.dish_name }}
+                </h3>
+                <div style="font-size: 0.88rem; color: var(--color-muted); margin-top: 0.2rem;">
+                  Requested by: <strong>{{ req.ngo_name }}</strong>
+                </div>
+              </div>
+
+              <div>
+                {% if req.status == 'Requested' %}
+                  <span class="badge badge-warning"><i data-lucide="clock"></i> Awaiting Your Approval</span>
+                {% elif req.status == 'Approved' %}
+                  <span class="badge badge-leaf"><i data-lucide="check"></i> Approved & Reserved</span>
+                {% elif req.status == 'Collected' %}
+                  <span class="badge badge-forest"><i data-lucide="truck"></i> Handed Over (Collected)</span>
+                {% elif req.status == 'Completed' %}
+                  <span class="badge badge-forest"><i data-lucide="award"></i> Completed & Distributed</span>
+                {% elif req.status == 'Rejected' %}
+                  <span class="badge badge-danger"><i data-lucide="x"></i> Declined</span>
+                {% else %}
+                  <span class="badge badge-earth">{{ req.status }}</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Workflow Status Timeline -->
+            <div class="status-timeline">
+              <div class="timeline-step {% if req.status in ['Requested', 'Approved', 'Collected', 'Completed'] %}completed{% endif %}">
+                <div class="timeline-circle">1</div>
+                <div class="timeline-label">Requested</div>
+              </div>
+              <div class="timeline-step {% if req.status in ['Approved', 'Collected', 'Completed'] %}completed{% elif req.status == 'Requested' %}active{% endif %}">
+                <div class="timeline-circle">2</div>
+                <div class="timeline-label">Approved</div>
+              </div>
+              <div class="timeline-step {% if req.status in ['Collected', 'Completed'] %}completed{% elif req.status == 'Approved' %}active{% endif %}">
+                <div class="timeline-circle">3</div>
+                <div class="timeline-label">Collected</div>
+              </div>
+              <div class="timeline-step {% if req.status == 'Completed' %}completed{% endif %}">
+                <div class="timeline-circle">4</div>
+                <div class="timeline-label">Distributed</div>
+              </div>
+            </div>
+
+            <!-- Request Details Box -->
+            <div style="background: var(--color-offwhite); border: 1px solid var(--color-beige); border-radius: var(--radius-md); padding: 0.85rem 1rem; margin-bottom: 1rem; font-size: 0.88rem;">
+              <div class="grid-2">
+                <div>
+                  <div style="color: var(--color-muted); font-size: 0.8rem;">Pickup Schedule:</div>
+                  <strong>{{ req.pickup_time }}</strong>
+                </div>
+                <div>
+                  <div style="color: var(--color-muted); font-size: 0.8rem;">NGO Message / Purpose:</div>
+                  <div>{{ req.notes or 'No additional notes provided' }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons based on status -->
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end; align-items: center;">
+              {% if req.status == 'Requested' %}
+                <form action="/restaurant/requests/{{ req._id }}/approve" method="POST" style="margin: 0;">
+                  <button type="submit" class="btn btn-primary btn-sm">
+                    <i data-lucide="check"></i> Approve & Lock Quantity
+                  </button>
+                </form>
+                <form action="/restaurant/requests/{{ req._id }}/reject" method="POST" onsubmit="return confirm('Decline this donation request?');" style="margin: 0;">
+                  <button type="submit" class="btn btn-secondary btn-sm">
+                    <i data-lucide="x"></i> Decline
+                  </button>
+                </form>
+              {% elif req.status == 'Approved' %}
+                <form action="/restaurant/requests/{{ req._id }}/mark-collected" method="POST" style="margin: 0;">
+                  <button type="submit" class="btn btn-leaf btn-sm">
+                    <i data-lucide="truck"></i> Confirm Food Handover to NGO
+                  </button>
+                </form>
+              {% elif req.status == 'Collected' %}
+                <span style="font-size: 0.85rem; color: var(--color-leaf); font-weight: 600;">
+                  <i data-lucide="check-circle-2"></i> Picked up. Awaiting NGO to log beneficiaries served.
+                </span>
+              {% elif req.status == 'Completed' %}
+                <span style="font-size: 0.85rem; color: var(--color-forest); font-weight: 600;">
+                  <i data-lucide="award"></i> Certified Distribution Complete
+                </span>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon"><i data-lucide="inbox"></i></div>
+        <h3 class="empty-title">No donation requests yet</h3>
+        <p class="empty-desc">When NGOs request servings from your surplus listings, they will appear here for review.</p>
+        <a href="/restaurant/surplus" class="btn btn-primary btn-sm">Manage Surplus Listings</a>
+      </div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

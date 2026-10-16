@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}NGO Profile - FoodCycle{% endblock %}
+
+{% block content %}
+<div class="grid-aside">
+  <!-- Sidebar -->
+  <aside class="portal-sidebar">
+    <div style="margin-bottom: 1.25rem;">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-forest);">{{ current_user.org_name }}</h3>
+      <span class="badge badge-leaf" style="font-size: 0.72rem; margin-top: 0.25rem;">
+        <i data-lucide="heart"></i> Humanitarian Partner
+      </span>
+    </div>
+
+    <div class="portal-nav-title">Management</div>
+    <ul class="portal-nav-list">
+      <li class="portal-nav-item"><a href="/ngo/dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+      <li class="portal-nav-item"><a href="/marketplace"><i data-lucide="shopping-bag"></i> Browse Surplus Food</a></li>
+      <li class="portal-nav-item"><a href="/ngo/requests"><i data-lucide="inbox"></i> My Requests</a></li>
+      <li class="portal-nav-item"><a href="/ngo/drives"><i data-lucide="award"></i> Feeding Drives</a></li>
+      <li class="portal-nav-item active"><a href="/ngo/profile"><i data-lucide="settings"></i> Organisation Profile</a></li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <section>
+    <div style="margin-bottom: 1.5rem;">
+      <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--color-dark);">NGO Organisation Profile</h1>
+      <p style="font-size: 0.92rem; color: var(--color-muted);">
+        Update your distribution areas, daily beneficiary capacity, and dietary preferences.
+      </p>
+    </div>
+
+    <div class="card" style="max-width: 720px;">
+      <form action="/ngo/profile" method="POST">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Organisation Name</label>
+            <input type="text" name="org_name" class="form-control" value="{{ current_user.org_name }}" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email (Account ID)</label>
+            <input type="email" class="form-control" value="{{ current_user.email }}" disabled>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Contact Phone</label>
+            <input type="text" name="contact_phone" class="form-control" value="{{ current_user.contact_phone }}" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Beneficiaries Served Daily (Capacity)</label>
+            <input type="number" name="beneficiaries_served_daily" class="form-control" value="{{ current_user.beneficiaries_served_daily or 50 }}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Operating Headquarters Address</label>
+          <input type="text" name="address" class="form-control" value="{{ current_user.address }}" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">City</label>
+            <input type="text" name="city" class="form-control" value="{{ current_user.city or 'Bengaluru' }}">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Dietary Acceptance</label>
+            <select name="dietary_preferences" class="form-control">
+              <option value="Both Vegetarian and Non-Vegetarian" {% if current_user.dietary_preferences == 'Both Vegetarian and Non-Vegetarian' %}selected{% endif %}>Both Veg & Non-Veg</option>
+              <option value="Pure Vegetarian Preferred" {% if current_user.dietary_preferences == 'Pure Vegetarian Preferred' %}selected{% endif %}>Pure Vegetarian Only</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Feeding Drive Details & Key Locations</label>
+          <textarea name="feeding_drive_details" class="form-control" rows="2">{{ current_user.feeding_drive_details or '' }}</textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="check"></i> Save NGO Profile
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Join FoodCycle Network - Registration{% endblock %}
+
+{% block content %}
+<div style="max-width: 640px; margin: 1.5rem auto;">
+  <div class="card" style="box-shadow: var(--shadow-md);">
+    <div style="text-align: center; margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--color-forest);">Join the FoodCycle Network</h2>
+      <p style="font-size: 0.9rem; color: var(--color-muted); margin-top: 0.25rem;">
+        Register as a commercial food business or verified humanitarian food rescue organization
+      </p>
+    </div>
+
+    <!-- Account Role Selector Tabs -->
+    <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; background: var(--color-beige-light); padding: 0.35rem; border-radius: var(--radius-md);">
+      <button type="button" id="tab-restaurant" class="btn btn-primary" style="flex: 1;" onclick="selectRole('restaurant')">
+        <i data-lucide="chef-hat"></i> Restaurant / Kitchen
+      </button>
+      <button type="button" id="tab-ngo" class="btn btn-secondary" style="flex: 1;" onclick="selectRole('ngo')">
+        <i data-lucide="heart-handshake"></i> Verified NGO
+      </button>
+    </div>
+
+    <form action="/register" method="POST" id="register-form">
+      <!-- Hidden Role Field -->
+      <input type="hidden" name="account_type" id="input-account-type" value="{{ selected_role or 'restaurant' }}">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" id="label-org-name">Restaurant / Commercial Kitchen Name</label>
+          <input type="text" name="org_name" class="form-control" placeholder="e.g. The Green Kitchen" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Official Email Address</label>
+          <input type="email" name="email" class="form-control" placeholder="contact@kitchen.org" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" name="password" class="form-control" placeholder="Minimum 6 characters" minlength="6" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Contact Phone Number</label>
+          <input type="text" name="contact_phone" class="form-control" placeholder="+91 98000 00000" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Physical Address</label>
+        <input type="text" name="address" class="form-control" placeholder="Street, locality, landmark" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">City</label>
+          <input type="text" name="city" class="form-control" value="Bengaluru" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Pincode</label>
+          <input type="text" name="pincode" class="form-control" placeholder="560001">
+        </div>
+      </div>
+
+      <!-- Restaurant-specific inputs -->
+      <div id="fields-restaurant">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Cuisine Type</label>
+            <input type="text" name="cuisine_type" class="form-control" placeholder="e.g. North Indian, Continental">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Operating Hours</label>
+            <input type="text" name="operating_hours" class="form-control" placeholder="11:00 AM - 11:00 PM">
+          </div>
+        </div>
+      </div>
+
+      <!-- NGO-specific inputs -->
+      <div id="fields-ngo" style="display: none;">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Beneficiaries Served Daily (Est.)</label>
+            <input type="number" name="beneficiaries_served_daily" class="form-control" value="60" min="5">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dietary Acceptance</label>
+            <select name="dietary_preferences" class="form-control">
+              <option value="Both Vegetarian and Non-Vegetarian">Both Veg & Non-Veg</option>
+              <option value="Pure Vegetarian Preferred">Pure Vegetarian Only</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Feeding Drive Details</label>
+          <input type="text" name="feeding_drive_details" class="form-control" placeholder="e.g. Night shelter distributions, slum educational camps">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.8rem; margin-top: 1rem;" id="btn-submit-register">
+        <i data-lucide="user-plus"></i> Complete Registration
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.5rem; font-size: 0.88rem; color: var(--color-muted); border-top: 1px solid var(--color-beige-light); padding-top: 1rem;">
+      Already registered? <a href="/login" style="font-weight: 600;">Sign in to your account</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function selectRole(role) {
+    const hiddenInput = document.getElementById('input-account-type');
+    const tabRest = document.getElementById('tab-restaurant');
+    const tabNgo = document.getElementById('tab-ngo');
+    const fieldsRest = document.getElementById('fields-restaurant');
+    const fieldsNgo = document.getElementById('fields-ngo');
+    const labelOrg = document.getElementById('label-org-name');
+
+    hiddenInput.value = role;
+
+    if (role === 'restaurant') {
+      tabRest.className = 'btn btn-primary';
+      tabNgo.className = 'btn btn-secondary';
+      fieldsRest.style.display = 'block';
+      fieldsNgo.style.display = 'none';
+      labelOrg.innerText = 'Restaurant / Commercial Kitchen Name';
+    } else {
+      tabNgo.className = 'btn btn-primary';
+      tabRest.className = 'btn btn-secondary';
+      fieldsRest.style.display = 'none';
+      fieldsNgo.style.display = 'block';
+      labelOrg.innerText = 'NGO / Food Relief Organisation Name';
+    }
+  }
+
+  // Pre-select if query parameter passed
+  document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const roleParam = urlParams.get('role');
+    if (roleParam === 'ngo') {
+      selectRole('ngo');
+    }
+  });
+</script>
+{% endblock %}

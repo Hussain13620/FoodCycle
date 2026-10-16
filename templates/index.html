@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}FoodCycle - Predict Better. Waste Less. Feed More.{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-pill">
+    <i data-lucide="award"></i> Supporting UN SDG 12: Responsible Consumption & Production
+  </div>
+  <h1 class="hero-title">
+    Predict Better. Waste Less. <span>Feed More.</span>
+  </h1>
+  <p class="hero-tagline">
+    A Complete Circular Food Ecosystem for Commercial Kitchens & Verified NGOs
+  </p>
+  <p class="hero-desc">
+    FoodCycle uses machine learning demand forecasting to help restaurants cook the right quantities, 
+    and instantly redistributes verified surplus meals to trusted humanitarian food rescue organizations.
+  </p>
+  <div class="hero-actions">
+    <a href="/register?role=restaurant" class="btn btn-primary btn-lg" id="btn-hero-restaurant">
+      <i data-lucide="chef-hat"></i> For Restaurants: Stop Overproduction
+    </a>
+    <a href="/marketplace" class="btn btn-secondary btn-lg" id="btn-hero-ngo">
+      <i data-lucide="heart-handshake"></i> For NGOs: Claim Surplus Meals
+    </a>
+  </div>
+</section>
+
+<!-- Live Impact Counters (Real Data from MongoDB) -->
+<div class="grid-4" style="margin-bottom: 3.5rem;">
+  <div class="kpi-card">
+    <div class="kpi-icon forest"><i data-lucide="utensils"></i></div>
+    <div class="kpi-content">
+      <h4>Meals Rescued</h4>
+      <div class="kpi-value">{{ stats.meals_distributed }}</div>
+      <div class="kpi-subtext">Verified distributions</div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-icon leaf"><i data-lucide="scale"></i></div>
+    <div class="kpi-content">
+      <h4>Food Waste Diverted</h4>
+      <div class="kpi-value">{{ stats.kg_diverted }} kg</div>
+      <div class="kpi-subtext">From landfills</div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-icon earth"><i data-lucide="users"></i></div>
+    <div class="kpi-content">
+      <h4>People Nourished</h4>
+      <div class="kpi-value">{{ stats.beneficiaries_served }}</div>
+      <div class="kpi-subtext">Vulnerable beneficiaries</div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-icon warning"><i data-lucide="shield-check"></i></div>
+    <div class="kpi-content">
+      <h4>Partner Network</h4>
+      <div class="kpi-value">{{ stats.restaurants_count + stats.ngos_count }}</div>
+      <div class="kpi-subtext">{{ stats.restaurants_count }} kitchens &middot; {{ stats.ngos_count }} NGOs</div>
+    </div>
+  </div>
+</div>
+
+<!-- Three Core Pillars -->
+<section class="pillars-section">
+  <div style="text-align: center; max-width: 680px; margin: 0 auto 2.5rem auto;">
+    <h2 style="font-size: 2rem; font-weight: 800; color: var(--color-forest); margin-bottom: 0.5rem;">
+      How FoodCycle Solves the Food Waste Crisis
+    </h2>
+    <p style="color: var(--color-muted);">
+      Nearly 30% of commercial kitchen food waste happens before serving due to inaccurate prep estimates. 
+      We tackle the root cause first, then salvage whatever surplus remains safely.
+    </p>
+  </div>
+
+  <div class="grid-3">
+    <div class="pillar-card">
+      <div class="pillar-icon" style="background: #E8F0EA; color: var(--color-forest);">
+        <i data-lucide="trending-up"></i>
+      </div>
+      <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem;">1. AI Demand Forecasting</h3>
+      <p style="font-size: 0.92rem; color: var(--color-muted); line-height: 1.6;">
+        Our scikit-learn regression models analyze weekday rushes, Indian festival dates (Diwali, Eid, Holi), 
+        and historical order trends to generate accurate prep guidelines.
+      </p>
+    </div>
+
+    <div class="pillar-card">
+      <div class="pillar-icon" style="background: #EEF4EB; color: var(--color-leaf);">
+        <i data-lucide="truck"></i>
+      </div>
+      <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem;">2. Surplus Food Marketplace</h3>
+      <p style="font-size: 0.92rem; color: var(--color-muted); line-height: 1.6;">
+        Inevitably, safe surplus occurs. Restaurants post dishes with prep times, storage temperatures, 
+        and strict expiration windows. Local NGOs reserve quantities atomically.
+      </p>
+    </div>
+
+    <div class="pillar-card">
+      <div class="pillar-icon" style="background: #F3ECE8; color: var(--color-earth);">
+        <i data-lucide="heart"></i>
+      </div>
+      <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem;">3. Verified Human Impact</h3>
+      <p style="font-size: 0.92rem; color: var(--color-muted); line-height: 1.6;">
+        No food goes unrecorded. When an NGO completes a distribution, the actual quantity and beneficiaries 
+        served are logged to create transparent sustainability reports.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Active Listings Preview Section -->
+<section style="margin: 4rem 0;">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+    <div>
+      <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--color-dark);">
+        Available Surplus Meals Right Now
+      </h2>
+      <p style="color: var(--color-muted); font-size: 0.92rem;">
+        Freshly cooked portions ready for timely pickup by registered humanitarian partners.
+      </p>
+    </div>
+    <a href="/marketplace" class="btn btn-outline btn-sm">
+      View All Listings <i data-lucide="arrow-right"></i>
+    </a>
+  </div>
+
+  {% if active_listings %}
+    <div class="grid-3">
+      {% for item in active_listings[:3] %}
+        <div class="marketplace-card" data-dish="{{ item.dish_name }}" data-category="{{ item.food_category }}" data-veg="{{ 'true' if item.is_vegetarian else 'false' }}">
+          <div class="marketplace-card-header">
+            <div>
+              <div class="marketplace-dish-title">{{ item.dish_name }}</div>
+              <div class="marketplace-restaurant">
+                <i data-lucide="map-pin"></i> {{ item.restaurant_name }}
+              </div>
+            </div>
+            {% if item.is_vegetarian %}
+              <span class="badge badge-veg"><i data-lucide="leaf"></i> Veg</span>
+            {% else %}
+              <span class="badge badge-nonveg"><i data-lucide="flame"></i> Non-Veg</span>
+            {% endif %}
+          </div>
+
+          <div class="marketplace-body">
+            <div class="marketplace-qty-box">
+              <span style="font-size: 0.85rem; font-weight: 600; color: var(--color-dark);">Available</span>
+              <span style="font-size: 1.2rem; font-weight: 800; color: var(--color-forest);">
+                {{ item.available_quantity }} {{ item.unit }}
+              </span>
+            </div>
+
+            <ul class="marketplace-details-list">
+              <li><i data-lucide="thermometer"></i> {{ item.storage_conditions }}</li>
+              <li><i data-lucide="clock"></i> Prepared: {{ item.preparation_time[:16].replace('T', ' ') }}</li>
+              <li data-expiry="{{ item.expiry_deadline }}"><i data-lucide="alert-circle"></i> Deadline: {{ item.expiry_deadline[:16].replace('T', ' ') }}</li>
+            </ul>
+          </div>
+
+          <div class="marketplace-footer">
+            <span class="badge badge-leaf">Free Donation</span>
+            {% if current_user and current_user.account_type == 'ngo' %}
+              <a href="/marketplace" class="btn btn-primary btn-sm">Request Servings</a>
+            {% else %}
+              <a href="/login" class="btn btn-secondary btn-sm">Sign in to Claim</a>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon"><i data-lucide="check-circle-2"></i></div>
+      <h3 class="empty-title">Zero Surplus Food Waste Today!</h3>
+      <p class="empty-desc">
+        All active commercial surplus listings have either been matched or kitchens adjusted prep accurately today.
+      </p>
+    </div>
+  {% endif %}
+</section>
+
+<!-- Call to Action -->
+<section style="background: var(--color-white); border: 1px solid var(--color-beige); border-radius: var(--radius-lg); padding: 3rem; text-align: center; margin: 4rem 0;">
+  <span class="badge badge-forest" style="margin-bottom: 1rem;"><i data-lucide="sparkles"></i> Hackathon Ready Demo</span>
+  <h2 style="font-size: 2rem; font-weight: 800; color: var(--color-forest); margin-bottom: 0.75rem;">
+    Experience the Circular Food Solution
+  </h2>
+  <p style="color: var(--color-muted); max-width: 600px; margin: 0 auto 1.75rem auto;">
+    Test how restaurants forecast weekend demand and how NGOs coordinate safe food rescue drives with zero friction.
+  </p>
+  <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+    <a href="/login" class="btn btn-primary btn-lg"><i data-lucide="log-in"></i> Explore Demo Accounts</a>
+    <a href="/about" class="btn btn-secondary btn-lg"><i data-lucide="book-open"></i> Learn About SDG 12</a>
+  </div>
+</section>
+{% endblock %}

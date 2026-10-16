@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}AI Demand Forecasting - FoodCycle{% endblock %}
+
+{% block content %}
+<div class="grid-aside">
+  <!-- Sidebar -->
+  <aside class="portal-sidebar">
+    <div style="margin-bottom: 1.25rem;">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-forest);">{{ current_user.org_name }}</h3>
+      <span class="badge badge-forest" style="font-size: 0.72rem; margin-top: 0.25rem;">
+        <i data-lucide="chef-hat"></i> Commercial Kitchen
+      </span>
+    </div>
+
+    <div class="portal-nav-title">Management</div>
+    <ul class="portal-nav-list">
+      <li class="portal-nav-item"><a href="/restaurant/dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+      <li class="portal-nav-item active"><a href="/restaurant/forecast"><i data-lucide="sparkles"></i> Demand Forecast</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/surplus"><i data-lucide="package-plus"></i> Surplus Listings</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/requests"><i data-lucide="inbox"></i> NGO Requests</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/menu"><i data-lucide="utensils"></i> Menu Items</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/sales"><i data-lucide="history"></i> Sales & Prep Log</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/profile"><i data-lucide="settings"></i> Kitchen Profile</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Forecast Content -->
+  <section>
+    <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--color-dark);">
+          Machine Learning Demand Forecasting
+        </h1>
+        <p style="font-size: 0.92rem; color: var(--color-muted);">
+          Predict dish sales to calculate optimal batch prep quantities, minimize expected surplus, and prevent stockouts.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <span class="badge badge-forest"><i data-lucide="shield-check"></i> Scikit-Learn Engine</span>
+        <span class="badge badge-leaf"><i data-lucide="calendar"></i> Chronological Validation</span>
+      </div>
+    </div>
+
+    <!-- Date Selection & Safety Margin Control Card -->
+    <div class="card" style="margin-bottom: 1.75rem; background: var(--color-beige-light); border-color: var(--color-beige);">
+      <form action="/restaurant/forecast" method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) auto; gap: 1rem; align-items: flex-end;">
+        <div>
+          <label class="form-label" style="font-weight: 700; color: var(--color-forest-dark);">
+            <i data-lucide="calendar"></i> Target Date
+          </label>
+          <input type="date" name="target_date" class="form-control" value="{{ target_date }}" required>
+        </div>
+
+        <div>
+          <label class="form-label" style="font-weight: 700; color: var(--color-forest-dark);">
+            <i data-lucide="sliders"></i> Safety Buffer Margin (%)
+          </label>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <input type="range" name="safety_margin" min="0" max="30" step="5" value="{{ safety_margin }}" class="form-control" id="safety-slider" oninput="document.getElementById('margin-val').innerText = this.value + '%'">
+            <span id="margin-val" style="font-weight: 700; font-size: 0.95rem; min-width: 42px;">{{ safety_margin }}%</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="form-label" style="font-weight: 700; color: var(--color-forest-dark);">
+            <i data-lucide="sparkles"></i> Special Event / Promotion
+          </label>
+          <input type="text" name="special_event" class="form-control" value="{{ special_event or '' }}" placeholder="e.g. Festival Catering, Live Music">
+        </div>
+
+        <div>
+          <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.25rem; width: 100%;">
+            <i data-lucide="play"></i> Run Prediction
+          </button>
+        </div>
+      </form>
+
+      {% if festival_detected %}
+        <div style="margin-top: 1rem; padding: 0.65rem 0.85rem; background: #FEF3C7; border: 1px solid #FDE68A; border-radius: var(--radius-sm); font-size: 0.88rem; color: #92400E; display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="calendar-heart"></i>
+          <span><strong>Festival Calendar Match:</strong> {{ festival_detected }} falls on {{ target_date }}. Festive dining patterns applied to forecast.</span>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Aggregate Production Summary Banner -->
+    <div class="grid-4" style="margin-bottom: 1.75rem;">
+      <div class="kpi-card">
+        <div class="kpi-icon forest"><i data-lucide="clipboard-list"></i></div>
+        <div class="kpi-content">
+          <h4>Total Demand</h4>
+          <div class="kpi-value">{{ total_predicted_demand }}</div>
+          <div class="kpi-subtext">Estimated customer orders</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon leaf"><i data-lucide="soup"></i></div>
+        <div class="kpi-content">
+          <h4>Target Production</h4>
+          <div class="kpi-value">{{ total_recommended_production }}</div>
+          <div class="kpi-subtext">With {{ safety_margin }}% buffer</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon earth"><i data-lucide="pie-chart"></i></div>
+        <div class="kpi-content">
+          <h4>Expected Surplus</h4>
+          <div class="kpi-value">{{ total_expected_surplus }}</div>
+          <div class="kpi-subtext">Controlled margin buffer</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon warning"><i data-lucide="check-circle-2"></i></div>
+        <div class="kpi-content">
+          <h4>Active Dishes</h4>
+          <div class="kpi-value">{{ predictions|length }}</div>
+          <div class="kpi-subtext">Forecasted individually</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed Forecast Table (As Requested in Spec) -->
+    <div class="card" style="margin-bottom: 2rem;">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i data-lucide="table"></i> Forecast Output for {{ target_date }}
+        </h3>
+        <form action="/restaurant/forecast/save" method="POST" style="margin: 0;">
+          <input type="hidden" name="target_date" value="{{ target_date }}">
+          <input type="hidden" name="safety_margin" value="{{ safety_margin }}">
+          <button type="submit" class="btn btn-secondary btn-sm">
+            <i data-lucide="save"></i> Save Daily Forecast
+          </button>
+        </form>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Dish Name</th>
+              <th>Historical Average</th>
+              <th>Predicted Demand</th>
+              <th>Recommended Production</th>
+              <th>Expected Surplus</th>
+              <th>Data Quality & Model</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pred in predictions %}
+              <tr>
+                <td>
+                  <strong>{{ pred.dish_name }}</strong>
+                  <div style="font-size: 0.78rem; color: var(--color-muted);">
+                    {{ pred.category }} &middot; ₹{{ pred.price }}
+                  </div>
+                </td>
+                <td>{{ pred.historical_avg }} servings</td>
+                <td>
+                  <span style="font-size: 1.15rem; font-weight: 800; color: var(--color-forest);">
+                    {{ pred.predicted_demand }}
+                  </span>
+                  <div style="font-size: 0.75rem; color: var(--color-muted);">servings</div>
+                </td>
+                <td>
+                  <strong style="font-size: 1.15rem; color: var(--color-dark);">
+                    {{ pred.recommended_production }}
+                  </strong>
+                  <div style="font-size: 0.75rem; color: var(--color-leaf); font-weight: 600;">
+                    {{ pred.suggested_adjustment }}
+                  </div>
+                </td>
+                <td>
+                  <span class="badge badge-earth">+{{ pred.expected_surplus }} servings</span>
+                </td>
+                <td>
+                  {% if pred.is_ml %}
+                    <span class="badge badge-forest"><i data-lucide="cpu"></i> {{ pred.data_quality }}</span>
+                  {% else %}
+                    <span class="badge badge-warning"><i data-lucide="alert-circle"></i> {{ pred.data_quality }}</span>
+                  {% endif %}
+                  <div style="font-size: 0.72rem; color: var(--color-muted); margin-top: 0.25rem;">
+                    {{ pred.model_used }}
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Explainability Breakdown Cards -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i data-lucide="info"></i> Model Explainability & Driving Factors
+        </h3>
+        <span class="badge badge-forest">Transparent AI</span>
+      </div>
+
+      <div class="grid-2">
+        {% for pred in predictions %}
+          <div style="background: var(--color-offwhite); border: 1px solid var(--color-beige); border-radius: var(--radius-md); padding: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <strong style="color: var(--color-dark);">{{ pred.dish_name }}</strong>
+              <span class="badge {% if pred.confidence_score > 75 %}badge-leaf{% else %}badge-warning{% endif %}">
+                {{ pred.confidence_score }}% Confidence
+              </span>
+            </div>
+
+            <ul style="list-style: none; font-size: 0.85rem; color: var(--color-muted); display: flex; flex-direction: column; gap: 0.35rem;">
+              {% for factor in pred.factors %}
+                <li style="display: flex; align-items: flex-start; gap: 0.4rem;">
+                  <span style="color: var(--color-forest); font-weight: bold;">&bull;</span>
+                  <span>{{ factor }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}

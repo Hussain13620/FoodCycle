@@ -1,0 +1,204 @@
+================================================================================
+                    FOODCYCLE - DEMO & PRESENTATION GUIDE
+          "Predict Better. Waste Less. Feed More." | UN SDG 12
+================================================================================
+
+STARTUP COMMANDS
+----------------
+  pip install -r requirements.txt
+  python seed_data.py
+  uvicorn main:app --reload
+
+  Open browser: http://localhost:8000
+
+NOTE: MongoDB must be running on localhost:27017 before starting.
+  Windows:  net start MongoDB
+  macOS:    brew services start mongodb/brew/mongodb-community
+  Linux:    sudo systemctl start mongod
+
+
+================================================================================
+                          LOGIN CREDENTIALS
+================================================================================
+
+RESTAURANT ACCOUNTS
+-------------------
+  Account 1: The Spice Pavilion (North & South Indian Traditional)
+    Email:    restaurant@foodcycle.org
+    Password: demo123
+
+  Account 2: Green Leaf Bistro (Healthy Bowls, Mediterranean & Fusion)
+    Email:    bistro@foodcycle.org
+    Password: demo123
+
+NGO ACCOUNTS
+------------
+  Account 1: Annapurna Food Relief (Night shelters, construction camps)
+    Email:    ngo@foodcycle.org
+    Password: demo123
+
+  Account 2: Hope Meal Foundation (Children education centers)
+    Email:    hope@foodcycle.org
+    Password: demo123
+
+TIP: On the Login page there are 1-click "Demo Restaurant" and "Demo NGO"
+     buttons that auto-fill credentials for you.
+
+
+================================================================================
+                     SEEDED SAMPLE DATA SUMMARY
+================================================================================
+
+MENU ITEMS (8 total)
+--------------------
+  The Spice Pavilion (6 items):
+    1. Dum Biryani (Vegetable / Paneer)    - Rs 280  - Rice & Biryani  - Veg
+    2. Hyderabadi Chicken Biryani          - Rs 340  - Rice & Biryani  - Non-Veg
+    3. Dal Makhani & Jeera Rice Meal       - Rs 240  - Main Course     - Veg
+    4. Paneer Butter Masala                - Rs 290  - Main Course     - Veg
+    5. Tandoori Roti & Naan Basket         - Rs 120  - Breads          - Veg
+    6. Gulab Jamun (Pack of 4)             - Rs 110  - Dessert         - Veg
+
+  Green Leaf Bistro (2 items):
+    7. Mediterranean Quinoa Falafel Bowl   - Rs 320  - Healthy Bowls   - Veg
+    8. Tuscan Grilled Vegetable Penne      - Rs 310  - Pasta & Mains   - Veg
+
+
+SALES HISTORY (540 records)
+---------------------------
+  - 90 days of daily sales for all 6 dishes of The Spice Pavilion
+  - Includes realistic patterns:
+      * Weekend surges (Fri/Sat/Sun have 25-50% higher demand)
+      * Indian festival spikes (Diwali, Dussehra, Eid, Holi, etc.)
+      * Daily random variance (+/- 10%)
+      * Typical overprep waste of 8-22% before FoodCycle
+      * Special events like "Live Music Weekend" on some Saturdays
+
+
+ACTIVE SURPLUS LISTINGS (3 listings)
+-------------------------------------
+  1. Dum Biryani (Veg/Paneer) - 15 servings available (of 40 total)
+     From: The Spice Pavilion
+     Storage: Hot Held (above 63C)
+     Expires: ~5 hours from seeding time
+
+  2. Dal Makhani & Jeera Rice Meal - 30 servings available
+     From: The Spice Pavilion
+     Storage: Hot Held (above 63C)
+     Expires: ~7 hours from seeding time
+
+  3. Mediterranean Quinoa Falafel Bowls - 20 portions available
+     From: Green Leaf Bistro
+     Storage: Refrigerated (under 5C)
+     Expires: ~4 hours from seeding time
+
+
+DONATION REQUESTS (2 active)
+-----------------------------
+  1. Annapurna Food Relief requested 25 servings of Dum Biryani
+     Status: APPROVED (waiting for pickup)
+
+  2. Hope Meal Foundation requested 15 servings of Dal Makhani
+     Status: REQUESTED (pending restaurant approval)
+
+
+COMPLETED DONATION RECORDS (4 historical)
+-------------------------------------------
+  1. 35 servings Dum Biryani     -> Annapurna Food Relief  -> 35 people fed
+  2. 40 servings Paneer Masala   -> Hope Meal Foundation   -> 40 people fed
+  3. 28 portions Mediterranean   -> Annapurna Food Relief  -> 28 people fed
+  4. 45 servings Chicken Biryani -> Annapurna Food Relief  -> 45 people fed
+  Total: 148 servings rescued, 148 beneficiaries served
+
+
+================================================================================
+                   SUGGESTED DEMO WALKTHROUGH (5 minutes)
+================================================================================
+
+STEP 1 - Landing Page (30 sec)
+  - Show live impact counters (meals rescued, kg diverted, CO2 avoided)
+  - Point out the 3 pillars: AI Forecasting, Surplus Marketplace, Verified Impact
+  - Show active surplus food cards at the bottom
+
+STEP 2 - Login as Restaurant (15 sec)
+  - Go to /login
+  - Click "Demo Restaurant" button (auto-fills credentials)
+  - Click "Sign In"
+
+STEP 3 - Restaurant Dashboard (30 sec)
+  - Show KPI cards: today's forecast, expected buffer, pending requests
+  - Point out the weekly demand chart (weekend spikes visible)
+  - Show the pending NGO request from Hope Meal Foundation
+
+STEP 4 - AI Demand Forecast (1 min) -- KEY FEATURE
+  - Click "Demand Forecast" in sidebar
+  - Set target date to 2026-11-08 (Diwali Sunday!)
+  - Click "Run Prediction"
+  - Show the forecast table: predicted demand, recommended production, surplus
+  - Point out the festival detection banner ("Diwali falls on this date")
+  - Scroll down to Model Explainability cards
+  - Highlight: "Weekend pattern: Sunday orders +22% vs average"
+  - Highlight: "Festival multiplier: Diwali boosts dining out"
+  - Mention: "High Quality ML Model - 90 records, RandomForestRegressor"
+
+STEP 5 - Approve NGO Request (30 sec)
+  - Click "NGO Requests" in sidebar
+  - Show the status timeline (Requested -> Approved -> Collected -> Completed)
+  - Approve the pending request from Hope Meal Foundation
+  - Show that available quantity decreases atomically
+
+STEP 6 - Post Surplus Food (30 sec)
+  - Click "Surplus Listings" in sidebar
+  - Click "Post New Surplus Food"
+  - Fill: dish name, quantity, prep time, expiry, storage temp
+  - Point out the food safety checkbox
+  - Submit
+
+STEP 7 - Switch to NGO Account (15 sec)
+  - Logout
+  - Login as NGO (click "Demo NGO" button)
+
+STEP 8 - NGO Dashboard & Marketplace (45 sec)
+  - Show pickup alerts for approved requests
+  - Click "Browse Surplus Food" to see the marketplace
+  - Show search filters (keyword, category, dietary type)
+  - Click "Request Servings" on a listing
+  - Fill quantity and pickup time, submit
+
+STEP 9 - Complete a Feeding Drive (30 sec)
+  - Go to "My Requests"
+  - Show the status timeline tracking
+  - If any request is in "Collected" status, click "Mark Distribution Complete"
+  - Enter beneficiaries served count
+  - Show the record appears in "Feeding Drives" history
+
+STEP 10 - Impact Page (15 sec)
+  - Click "Impact" in top navigation
+  - Show verified metrics from actual database records
+  - Show Chart.js pie chart and bar chart
+  - Point out: "All metrics calculated from real MongoDB records"
+
+
+================================================================================
+                        KEY TALKING POINTS
+================================================================================
+
+  * "FoodCycle tackles the ROOT CAUSE of food waste - inaccurate demand
+    prediction - not just the symptoms."
+
+  * "Our ML engine uses RandomForestRegressor with chronological validation,
+    so no future data leaks into training. It considers weekday patterns,
+    Indian festivals, and recent momentum trends."
+
+  * "When a restaurant has only 5 leftover servings and two NGOs both want
+    4, our atomic MongoDB operations prevent overbooking."
+
+  * "Every donated meal is tracked end-to-end: from kitchen prep timestamp
+    to NGO distribution, with beneficiary counts logged for transparent
+    sustainability reporting."
+
+  * "Food safety is non-negotiable. Listings require temperature disclosures
+    (Hot-held >63C or Chilled <5C), allergen declarations, and strict
+    pickup deadlines."
+
+================================================================================

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}MongoDB Connection Required - FoodCycle{% endblock %}
+
+{% block content %}
+<div style="max-width: 680px; margin: 3rem auto;">
+  <div class="card" style="border-top: 4px solid var(--color-danger); box-shadow: var(--shadow-md);">
+    <div style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.5rem;">
+      <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--color-danger-light); color: var(--color-danger); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+        <i data-lucide="database-zap"></i>
+      </div>
+      <div>
+        <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--color-dark);">
+          MongoDB Connection Unavailable
+        </h2>
+        <p style="font-size: 0.95rem; color: var(--color-muted); margin-top: 0.25rem;">
+          FoodCycle requires an active local MongoDB instance at <code>mongodb://localhost:27017/</code> to securely store and process data.
+        </p>
+      </div>
+    </div>
+
+    <div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.5rem;">
+      <h4 style="font-size: 0.95rem; font-weight: 700; color: #92400E; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
+        <i data-lucide="terminal"></i> How to Start MongoDB:
+      </h4>
+      <div style="font-size: 0.88rem; line-height: 1.6; color: #78350F;">
+        <p style="margin-bottom: 0.5rem;"><strong>On Windows:</strong></p>
+        <pre style="background: #FEF3C7; padding: 0.5rem 0.75rem; border-radius: 4px; font-family: monospace; font-size: 0.85rem; margin-bottom: 0.75rem;">net start MongoDB</pre>
+        <p style="margin-bottom: 0.5rem;">Or run <code>mongod</code> directly from your MongoDB bin directory.</p>
+        <hr style="border: 0; border-top: 1px solid #FDE68A; margin: 0.75rem 0;">
+        <p style="margin-bottom: 0.5rem;"><strong>On macOS:</strong></p>
+        <pre style="background: #FEF3C7; padding: 0.5rem 0.75rem; border-radius: 4px; font-family: monospace; font-size: 0.85rem; margin-bottom: 0.75rem;">brew services start mongodb/brew/mongodb-community</pre>
+        <p style="margin-bottom: 0.5rem;"><strong>On Linux (Ubuntu/Debian):</strong></p>
+        <pre style="background: #FEF3C7; padding: 0.5rem 0.75rem; border-radius: 4px; font-family: monospace; font-size: 0.85rem;">sudo systemctl start mongod</pre>
+      </div>
+    </div>
+
+    {% if error_details %}
+      <div style="margin-bottom: 1.5rem;">
+        <h5 style="font-size: 0.82rem; text-transform: uppercase; color: var(--color-muted); margin-bottom: 0.25rem;">Technical Details:</h5>
+        <pre style="background: #F4EFE6; padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.8rem; overflow-x: auto; color: var(--color-dark);">{{ error_details }}</pre>
+      </div>
+    {% endif %}
+
+    <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+      <a href="javascript:location.reload()" class="btn btn-primary">
+        <i data-lucide="refresh-cw"></i> Retry Connection
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

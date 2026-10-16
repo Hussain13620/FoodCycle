@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}How It Works - FoodCycle{% endblock %}
+
+{% block content %}
+<div style="max-width: 960px; margin: 0 auto;">
+  <div style="text-align: center; margin-bottom: 3rem;">
+    <span class="badge badge-forest" style="margin-bottom: 0.75rem;">
+      <i data-lucide="git-merge"></i> End-to-End Workflow
+    </span>
+    <h1 style="font-size: 2.4rem; font-weight: 800; color: var(--color-forest); margin-bottom: 0.75rem;">
+      How FoodCycle Operates
+    </h1>
+    <p style="font-size: 1.1rem; color: var(--color-muted);">
+      A seamless, four-step circular pipeline connecting kitchen forecasts to verified community meals.
+    </p>
+  </div>
+
+  <!-- Interactive Workflow Step Cards -->
+  <div style="display: flex; flex-direction: column; gap: 2rem;">
+    
+    <!-- Step 1 -->
+    <div class="card" style="display: flex; gap: 1.75rem; align-items: flex-start;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #E8F0EA; color: var(--color-forest); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 800; flex-shrink: 0;">
+        1
+      </div>
+      <div>
+        <h3 style="font-size: 1.3rem; font-weight: 700; color: var(--color-dark); margin-bottom: 0.5rem;">
+          Forecast Daily Kitchen Demand
+        </h3>
+        <p style="font-size: 0.95rem; color: var(--color-muted); line-height: 1.6; margin-bottom: 0.75rem;">
+          Restaurants record daily dish sales or load past order history. FoodCycle’s prediction model analyzes day-of-week trends, weekend patterns, and Indian festival spikes (Diwali, Eid, Holi) to generate dish-by-dish production targets with custom safety buffers.
+        </p>
+        <span class="badge badge-forest"><i data-lucide="cpu"></i> Machine Learning Demand Regression</span>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="card" style="display: flex; gap: 1.75rem; align-items: flex-start;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #EEF4EB; color: var(--color-leaf); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 800; flex-shrink: 0;">
+        2
+      </div>
+      <div>
+        <h3 style="font-size: 1.3rem; font-weight: 700; color: var(--color-dark); margin-bottom: 0.5rem;">
+          Publish Fresh Surplus with Safety Guidelines
+        </h3>
+        <p style="font-size: 0.95rem; color: var(--color-muted); line-height: 1.6; margin-bottom: 0.75rem;">
+          When prepared dishes remain unserved after lunch or dinner service, restaurants publish a listing specifying exact quantity, cooking time, holding temperature (Hot-held >63°C, Chilled <5°C), allergens, and strict pickup deadline.
+        </p>
+        <span class="badge badge-warning"><i data-lucide="shield-alert"></i> Temperature & Freshness Verification</span>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="card" style="display: flex; gap: 1.75rem; align-items: flex-start;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #F3ECE8; color: var(--color-earth); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 800; flex-shrink: 0;">
+        3
+      </div>
+      <div>
+        <h3 style="font-size: 1.3rem; font-weight: 700; color: var(--color-dark); margin-bottom: 0.5rem;">
+          NGO Claim & Atomic Quantity Reservation
+        </h3>
+        <p style="font-size: 0.95rem; color: var(--color-muted); line-height: 1.6; margin-bottom: 0.75rem;">
+          Verified NGOs browse the live marketplace and request specific quantities matching their distribution capacity. FoodCycle locks the requested portions atomically in MongoDB to prevent overbooking, then notifies the restaurant for pickup coordination.
+        </p>
+        <span class="badge badge-earth"><i data-lucide="lock"></i> Atomic Database Concurrency Protection</span>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="card" style="display: flex; gap: 1.75rem; align-items: flex-start;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #E8F0EA; color: var(--color-forest); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 800; flex-shrink: 0;">
+        4
+      </div>
+      <div>
+        <h3 style="font-size: 1.3rem; font-weight: 700; color: var(--color-dark); margin-bottom: 0.5rem;">
+          Verified Collection & Measured Community Impact
+        </h3>
+        <p style="font-size: 0.95rem; color: var(--color-muted); line-height: 1.6; margin-bottom: 0.75rem;">
+          Upon receiving the meals, the NGO completes the handover and registers the exact number of people nourished. Both partners receive certified sustainability data documenting food waste diverted and meals delivered.
+        </p>
+        <span class="badge badge-leaf"><i data-lucide="check-circle-2"></i> Verified Real-World Impact Records</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="background: var(--color-white); border: 1px solid var(--color-beige); border-radius: var(--radius-lg); padding: 2.5rem; text-align: center; margin-top: 3.5rem;">
+    <h3 style="font-size: 1.4rem; font-weight: 700; color: var(--color-forest); margin-bottom: 0.75rem;">
+      Ready to see it in action?
+    </h3>
+    <p style="color: var(--color-muted); margin-bottom: 1.5rem;">
+      Log into a sample restaurant account to inspect AI forecasts or browse available surplus listings.
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+      <a href="/login" class="btn btn-primary btn-lg">Log in with Demo Account</a>
+      <a href="/marketplace" class="btn btn-secondary btn-lg">Browse Surplus Food</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

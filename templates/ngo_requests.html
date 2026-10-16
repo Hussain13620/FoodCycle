@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}My Donation Requests - FoodCycle{% endblock %}
+
+{% block content %}
+<div class="grid-aside">
+  <!-- Sidebar -->
+  <aside class="portal-sidebar">
+    <div style="margin-bottom: 1.25rem;">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-forest);">{{ current_user.org_name }}</h3>
+      <span class="badge badge-leaf" style="font-size: 0.72rem; margin-top: 0.25rem;">
+        <i data-lucide="heart"></i> Humanitarian Partner
+      </span>
+    </div>
+
+    <div class="portal-nav-title">Management</div>
+    <ul class="portal-nav-list">
+      <li class="portal-nav-item"><a href="/ngo/dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+      <li class="portal-nav-item"><a href="/marketplace"><i data-lucide="shopping-bag"></i> Browse Surplus Food</a></li>
+      <li class="portal-nav-item active"><a href="/ngo/requests"><i data-lucide="inbox"></i> My Requests</a></li>
+      <li class="portal-nav-item"><a href="/ngo/drives"><i data-lucide="award"></i> Feeding Drives</a></li>
+      <li class="portal-nav-item"><a href="/ngo/profile"><i data-lucide="settings"></i> Organisation Profile</a></li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <section>
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--color-dark);">My Food Rescue Requests</h1>
+        <p style="font-size: 0.92rem; color: var(--color-muted);">
+          Track status updates, coordinate pickups with kitchens, and log people served.
+        </p>
+      </div>
+
+      <a href="/marketplace" class="btn btn-primary btn-sm">
+        <i data-lucide="plus"></i> Request More Food
+      </a>
+    </div>
+
+    {% if requests_list %}
+      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        {% for req in requests_list %}
+          <div class="card" style="border-left: 4px solid {% if req.status == 'Approved' %}var(--color-leaf){% elif req.status == 'Requested' %}var(--color-warning){% elif req.status == 'Completed' %}var(--color-forest){% else %}var(--color-muted){% endif %};">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
+              <div>
+                <span class="badge badge-earth" style="margin-bottom: 0.35rem;">Request #{{ req._id }}</span>
+                <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--color-dark);">
+                  {{ req.requested_quantity }} Servings &middot; {{ req.dish_name }}
+                </h3>
+                <div style="font-size: 0.88rem; color: var(--color-muted); margin-top: 0.2rem;">
+                  Donor Kitchen: <strong>{{ req.restaurant_name }}</strong>
+                </div>
+              </div>
+
+              <div>
+                {% if req.status == 'Requested' %}
+                  <span class="badge badge-warning"><i data-lucide="clock"></i> Pending Restaurant Approval</span>
+                {% elif req.status == 'Approved' %}
+                  <span class="badge badge-leaf"><i data-lucide="check-circle-2"></i> Approved & Ready for Pickup</span>
+                {% elif req.status == 'Collected' %}
+                  <span class="badge badge-forest"><i data-lucide="truck"></i> Food Collected</span>
+                {% elif req.status == 'Completed' %}
+                  <span class="badge badge-forest"><i data-lucide="award"></i> Certified Distribution Complete</span>
+                {% elif req.status == 'Rejected' %}
+                  <span class="badge badge-danger"><i data-lucide="x"></i> Request Declined</span>
+                {% else %}
+                  <span class="badge badge-earth">{{ req.status }}</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Workflow Status Timeline -->
+            <div class="status-timeline">
+              <div class="timeline-step {% if req.status in ['Requested', 'Approved', 'Collected', 'Completed'] %}completed{% endif %}">
+                <div class="timeline-circle">1</div>
+                <div class="timeline-label">Requested</div>
+              </div>
+              <div class="timeline-step {% if req.status in ['Approved', 'Collected', 'Completed'] %}completed{% elif req.status == 'Requested' %}active{% endif %}">
+                <div class="timeline-circle">2</div>
+                <div class="timeline-label">Approved</div>
+              </div>
+              <div class="timeline-step {% if req.status in ['Collected', 'Completed'] %}completed{% elif req.status == 'Approved' %}active{% endif %}">
+                <div class="timeline-circle">3</div>
+                <div class="timeline-label">Collected</div>
+              </div>
+              <div class="timeline-step {% if req.status == 'Completed' %}completed{% endif %}">
+                <div class="timeline-circle">4</div>
+                <div class="timeline-label">Completed</div>
+              </div>
+            </div>
+
+            <!-- Schedule & Details -->
+            <div style="background: var(--color-offwhite); border: 1px solid var(--color-beige); border-radius: var(--radius-md); padding: 0.85rem 1rem; margin-bottom: 1rem; font-size: 0.88rem;">
+              <div class="grid-2">
+                <div>
+                  <div style="color: var(--color-muted); font-size: 0.8rem;">Scheduled Pickup Time:</div>
+                  <strong>{{ req.pickup_time }}</strong>
+                </div>
+                <div>
+                  <div style="color: var(--color-muted); font-size: 0.8rem;">Your Notes:</div>
+                  <div>{{ req.notes or 'No special instructions recorded.' }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end; align-items: center;">
+              {% if req.status == 'Requested' %}
+                <form action="/ngo/requests/{{ req._id }}/cancel" method="POST" onsubmit="return confirm('Cancel this request?');" style="margin: 0;">
+                  <button type="submit" class="btn btn-secondary btn-sm">
+                    <i data-lucide="x"></i> Cancel Request
+                  </button>
+                </form>
+              {% elif req.status == 'Approved' %}
+                <form action="/ngo/requests/{{ req._id }}/confirm-pickup" method="POST" style="margin: 0;">
+                  <button type="submit" class="btn btn-leaf btn-sm">
+                    <i data-lucide="truck"></i> I Have Picked Up The Food
+                  </button>
+                </form>
+              {% elif req.status == 'Collected' %}
+                <button type="button" class="btn btn-primary btn-sm" onclick="openCompleteDriveModal('{{ req._id }}', '{{ req.dish_name }}', {{ req.requested_quantity }})">
+                  <i data-lucide="award"></i> Mark Distribution Complete & Log People Served
+                </button>
+              {% elif req.status == 'Completed' %}
+                <span style="font-size: 0.85rem; color: var(--color-forest); font-weight: 600;">
+                  <i data-lucide="check-circle-2"></i> Verified in Platform Sustainability Registry
+                </span>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon"><i data-lucide="shopping-bag"></i></div>
+        <h3 class="empty-title">You haven't requested any food yet</h3>
+        <p class="empty-desc">Explore the live surplus food marketplace to match available portions with your feeding programs.</p>
+        <a href="/marketplace" class="btn btn-primary btn-sm">Browse Live Surplus Food</a>
+      </div>
+    {% endif %}
+  </section>
+</div>
+
+<!-- Modal: Complete Drive & Record Beneficiaries Served -->
+<div id="completeDriveModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--color-dark);">
+        <i data-lucide="award"></i> Complete Feeding Drive Record
+      </h3>
+      <button type="button" class="modal-close" onclick="closeModal('completeDriveModal')">&times;</button>
+    </div>
+
+    <form action="/ngo/requests/complete" method="POST">
+      <input type="hidden" name="request_id" id="complete-request-id">
+
+      <div style="background: var(--color-beige-light); border: 1px solid var(--color-beige); border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1.25rem;">
+        <strong id="complete-dish-name" style="font-size: 1.05rem; color: var(--color-dark);">Dish Name</strong>
+        <div style="font-size: 0.85rem; color: var(--color-forest); font-weight: 600; margin-top: 0.2rem;">
+          Collected Portions: <span id="complete-qty">0</span> servings
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Actual Portions Distributed</label>
+        <input type="number" name="actual_quantity" id="complete-actual-qty" class="form-control" min="1" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Total Beneficiaries / People Nourished</label>
+        <input type="number" name="beneficiaries_served" class="form-control" min="1" value="25" required>
+        <div class="form-text">This will be added to your organization's verified impact tally.</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Drive Location / Community Notes</label>
+        <textarea name="notes" class="form-control" rows="2" placeholder="e.g. Distributed to families at construction labor colony. Zero food wasted."></textarea>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('completeDriveModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary"><i data-lucide="check"></i> Submit Certified Record</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function openCompleteDriveModal(reqId, dishName, qty) {
+    document.getElementById('complete-request-id').value = reqId;
+    document.getElementById('complete-dish-name').innerText = dishName;
+    document.getElementById('complete-qty').innerText = qty;
+    document.getElementById('complete-actual-qty').value = qty;
+    openModal('completeDriveModal');
+  }
+</script>
+{% endblock %}

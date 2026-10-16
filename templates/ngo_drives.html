@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Feeding Drives & Impact - FoodCycle{% endblock %}
+
+{% block content %}
+<div class="grid-aside">
+  <!-- Sidebar -->
+  <aside class="portal-sidebar">
+    <div style="margin-bottom: 1.25rem;">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-forest);">{{ current_user.org_name }}</h3>
+      <span class="badge badge-leaf" style="font-size: 0.72rem; margin-top: 0.25rem;">
+        <i data-lucide="heart"></i> Humanitarian Partner
+      </span>
+    </div>
+
+    <div class="portal-nav-title">Management</div>
+    <ul class="portal-nav-list">
+      <li class="portal-nav-item"><a href="/ngo/dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+      <li class="portal-nav-item"><a href="/marketplace"><i data-lucide="shopping-bag"></i> Browse Surplus Food</a></li>
+      <li class="portal-nav-item"><a href="/ngo/requests"><i data-lucide="inbox"></i> My Requests</a></li>
+      <li class="portal-nav-item active"><a href="/ngo/drives"><i data-lucide="award"></i> Feeding Drives</a></li>
+      <li class="portal-nav-item"><a href="/ngo/profile"><i data-lucide="settings"></i> Organisation Profile</a></li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <section>
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--color-dark);">Verified Feeding Drives</h1>
+        <p style="font-size: 0.92rem; color: var(--color-muted);">
+          Permanent record of surplus meals rescued and communities nourished by {{ current_user.org_name }}.
+        </p>
+      </div>
+
+      <span class="badge badge-forest"><i data-lucide="check-check"></i> Certified Auditable Log</span>
+    </div>
+
+    <!-- Drive Aggregate Stats -->
+    <div class="grid-3" style="margin-bottom: 1.5rem;">
+      <div class="kpi-card">
+        <div class="kpi-icon forest"><i data-lucide="utensils"></i></div>
+        <div class="kpi-content">
+          <h4>Total Meals Rescued</h4>
+          <div class="kpi-value">{{ total_rescued }}</div>
+          <div class="kpi-subtext">Portions distributed</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon leaf"><i data-lucide="users"></i></div>
+        <div class="kpi-content">
+          <h4>People Nourished</h4>
+          <div class="kpi-value">{{ total_served }}</div>
+          <div class="kpi-subtext">Documented beneficiaries</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon earth"><i data-lucide="calendar"></i></div>
+        <div class="kpi-content">
+          <h4>Completed Drives</h4>
+          <div class="kpi-value">{{ drives_list|length }}</div>
+          <div class="kpi-subtext">Zero-waste rescue missions</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drives Table -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><i data-lucide="list"></i> Community Distribution History</h3>
+        <span class="badge badge-leaf">UN SDG 12 Aligned</span>
+      </div>
+
+      {% if drives_list %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Donor Restaurant</th>
+                <th>Food Item</th>
+                <th>Quantity Distributed</th>
+                <th>Beneficiaries Served</th>
+                <th>Drive Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for drive in drives_list %}
+                <tr>
+                  <td><strong>{{ drive.completion_date[:10] }}</strong></td>
+                  <td>{{ drive.restaurant_name }}</td>
+                  <td>{{ drive.dish_name }}</td>
+                  <td><span class="badge badge-forest">{{ drive.quantity_collected }} {{ drive.unit }}</span></td>
+                  <td><strong style="color: var(--color-dark);">{{ drive.beneficiaries_served }} people</strong></td>
+                  <td style="font-size: 0.85rem; color: var(--color-muted);">{{ drive.notes or 'Distribution completed successfully.' }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon"><i data-lucide="inbox"></i></div>
+          <h3 class="empty-title">No completed feeding drives yet</h3>
+          <p class="empty-desc">When you pick up surplus food and complete a distribution, your certified records will appear here.</p>
+          <a href="/marketplace" class="btn btn-primary btn-sm">Explore Food Marketplace</a>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Surplus Food Marketplace - FoodCycle{% endblock %}
+
+{% block content %}
+<div style="max-width: 1240px; margin: 0 auto;">
+  <!-- Header & Filters Banner -->
+  <div style="margin-bottom: 2rem;">
+    <span class="badge badge-forest" style="margin-bottom: 0.5rem;">
+      <i data-lucide="store"></i> Live Circular Food Rescue
+    </span>
+    <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--color-forest); margin-bottom: 0.5rem;">
+      Surplus Food Redistribution Marketplace
+    </h1>
+    <p style="font-size: 1rem; color: var(--color-muted); max-width: 780px;">
+      Verified commercial restaurants list wholesome, unserved food portions. Registered NGOs can request exact meal quantities for scheduled humanitarian pickup.
+    </p>
+  </div>
+
+  <!-- Food Safety Guidelines Banner -->
+  <div class="safety-callout" style="margin-bottom: 1.5rem;">
+    <h5><i data-lucide="shield-check"></i> Quality & Temperature Disclosures</h5>
+    <span>
+      All listings below include recorded preparation timestamps, temperature management guidelines (Chilled &lt;5&deg;C or Hot-Held &gt;63&deg;C), and strict pickup deadlines. Transport using insulated containers is required.
+    </span>
+  </div>
+
+  <!-- Search & Filter Controls -->
+  <div class="card" style="margin-bottom: 2rem; background: var(--color-white); border-color: var(--color-beige);">
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 1rem; align-items: flex-end;">
+      <div>
+        <label class="form-label"><i data-lucide="search"></i> Search Dishes or Keywords</label>
+        <input type="text" id="marketplace-search" class="form-control" placeholder="Search biryani, meals, curry, bowls..." oninput="filterMarketplace()">
+      </div>
+
+      <div>
+        <label class="form-label"><i data-lucide="filter"></i> Food Category</label>
+        <select id="marketplace-category" class="form-control" onchange="filterMarketplace()">
+          <option value="all">All Categories</option>
+          <option value="Prepared Rice & Meals">Prepared Rice & Meals</option>
+          <option value="Main Course">Main Course</option>
+          <option value="Healthy Bowls">Healthy Bowls</option>
+          <option value="Breads & Rotis">Breads & Rotis</option>
+          <option value="Desserts & Sweets">Desserts & Sweets</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="form-label"><i data-lucide="leaf"></i> Dietary Preference</label>
+        <select id="marketplace-dietary" class="form-control" onchange="filterMarketplace()">
+          <option value="all">All Dietary Types</option>
+          <option value="veg">Pure Vegetarian Only</option>
+          <option value="nonveg">Non-Vegetarian</option>
+        </select>
+      </div>
+
+      <div>
+        <button type="button" class="btn btn-secondary" style="width: 100%;" onclick="document.getElementById('marketplace-search').value=''; document.getElementById('marketplace-category').value='all'; document.getElementById('marketplace-dietary').value='all'; filterMarketplace();">
+          <i data-lucide="rotate-ccw"></i> Reset
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Listings Grid -->
+  {% if listings %}
+    <div class="grid-3" id="marketplace-grid">
+      {% for item in listings %}
+        <div class="marketplace-card" 
+             data-dish="{{ item.dish_name }}" 
+             data-category="{{ item.food_category }}" 
+             data-veg="{{ 'true' if item.is_vegetarian else 'false' }}">
+          
+          <div class="marketplace-card-header">
+            <div>
+              <div class="marketplace-dish-title">{{ item.dish_name }}</div>
+              <div class="marketplace-restaurant">
+                <i data-lucide="map-pin"></i> {{ item.restaurant_name }}
+              </div>
+            </div>
+            {% if item.is_vegetarian %}
+              <span class="badge badge-veg"><i data-lucide="leaf"></i> Veg</span>
+            {% else %}
+              <span class="badge badge-nonveg"><i data-lucide="flame"></i> Non-Veg</span>
+            {% endif %}
+          </div>
+
+          <div class="marketplace-body">
+            <div class="marketplace-qty-box">
+              <div>
+                <span style="font-size: 0.8rem; font-weight: 600; color: var(--color-muted); display: block;">Available Quantity</span>
+                <span style="font-size: 1.3rem; font-weight: 800; color: var(--color-forest);">
+                  {{ item.available_quantity }} {{ item.unit }}
+                </span>
+              </div>
+              <span class="badge badge-leaf">Free Donation</span>
+            </div>
+
+            <ul class="marketplace-details-list">
+              <li><i data-lucide="thermometer"></i> <strong>Storage:</strong> {{ item.storage_conditions }}</li>
+              <li><i data-lucide="clock"></i> <strong>Prepared:</strong> {{ item.preparation_time[:16].replace('T', ' ') }}</li>
+              <li data-expiry="{{ item.expiry_deadline }}"><i data-lucide="alert-circle"></i> <strong>Deadline:</strong> {{ item.expiry_deadline[:16].replace('T', ' ') }}</li>
+              {% if item.allergens %}
+                <li><i data-lucide="info"></i> <strong>Allergens:</strong> {{ item.allergens|join(', ') }}</li>
+              {% endif %}
+              <li><i data-lucide="map-pin"></i> <strong>Address:</strong> {{ item.pickup_address }}</li>
+            </ul>
+
+            {% if item.notes %}
+              <div style="font-size: 0.8rem; color: var(--color-muted); background: var(--color-offwhite); padding: 0.5rem; border-radius: 4px; margin-top: 0.5rem; border: 1px dashed var(--color-beige);">
+                <i data-lucide="message-square"></i> {{ item.notes }}
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="marketplace-footer">
+            <span style="font-size: 0.8rem; color: var(--color-muted);">
+              Min: {{ item.min_pickup_quantity }} {{ item.unit }}
+            </span>
+
+            {% if current_user and current_user.account_type == 'ngo' %}
+              <button type="button" class="btn btn-primary btn-sm" onclick="openClaimModal('{{ item._id }}', '{{ item.dish_name }}', '{{ item.restaurant_name }}', {{ item.available_quantity }}, '{{ item.unit }}')">
+                <i data-lucide="heart-handshake"></i> Request Servings
+              </button>
+            {% elif current_user and current_user.account_type == 'restaurant' %}
+              <span class="badge badge-earth">Restaurant View</span>
+            {% else %}
+              <a href="/login" class="btn btn-secondary btn-sm">
+                <i data-lucide="log-in"></i> Sign in as NGO
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Empty Results Filter Message -->
+    <div id="marketplace-empty-results" class="empty-state" style="display: none; margin-top: 2rem;">
+      <div class="empty-icon"><i data-lucide="filter-x"></i></div>
+      <h3 class="empty-title">No listings match your search</h3>
+      <p class="empty-desc">Try clearing filters or searching for a different keyword.</p>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon"><i data-lucide="check-circle-2"></i></div>
+      <h3 class="empty-title">No surplus food listings right now</h3>
+      <p class="empty-desc">Commercial kitchen listings appear here when unserved portions are recorded after lunch and dinner prep.</p>
+      {% if current_user and current_user.account_type == 'restaurant' %}
+        <a href="/restaurant/surplus" class="btn btn-primary btn-sm" style="margin-top: 0.5rem;">Post Surplus Food</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+
+<!-- Request Servings Modal (NGO Only) -->
+<div id="claimModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--color-dark);">
+        <i data-lucide="heart-handshake"></i> Request Surplus Meals
+      </h3>
+      <button type="button" class="modal-close" onclick="closeModal('claimModal')">&times;</button>
+    </div>
+
+    <form action="/ngo/requests" method="POST">
+      <input type="hidden" name="listing_id" id="claim-listing-id">
+
+      <div style="background: var(--color-beige-light); border: 1px solid var(--color-beige); border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1.25rem;">
+        <strong id="claim-dish-name" style="font-size: 1.05rem; color: var(--color-dark);">Dish Name</strong>
+        <div style="font-size: 0.85rem; color: var(--color-muted); margin-top: 0.2rem;">
+          Offered by: <span id="claim-restaurant-name">Restaurant</span>
+        </div>
+        <div style="font-size: 0.85rem; color: var(--color-forest); font-weight: 600; margin-top: 0.2rem;">
+          Total Remaining: <span id="claim-max-qty">0</span> <span id="claim-unit">servings</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">How many servings do you need?</label>
+        <input type="number" name="requested_quantity" id="claim-input-qty" class="form-control" min="1" value="10" required>
+        <div class="form-text">Request only what your organization can transport and distribute safely.</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Estimated Pickup Time</label>
+        <input type="datetime-local" name="pickup_time" class="form-control" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Beneficiary Details & Notes</label>
+        <textarea name="notes" class="form-control" rows="2" placeholder="e.g. Bringing thermal containers for distribution at community center."></textarea>
+      </div>
+
+      <div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 4px; padding: 0.75rem; font-size: 0.8rem; color: #92400E; margin-bottom: 1.25rem;">
+        <i data-lucide="shield-alert"></i> <strong>Responsible Redistribution:</strong> You agree to transport meals safely according to food hygiene guidelines.
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('claimModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary"><i data-lucide="send"></i> Submit Request</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function openClaimModal(listingId, dishName, restaurantName, maxQty, unit) {
+    document.getElementById('claim-listing-id').value = listingId;
+    document.getElementById('claim-dish-name').innerText = dishName;
+    document.getElementById('claim-restaurant-name').innerText = restaurantName;
+    document.getElementById('claim-max-qty').innerText = maxQty;
+    document.getElementById('claim-unit').innerText = unit;
+
+    const inputQty = document.getElementById('claim-input-qty');
+    inputQty.max = maxQty;
+    inputQty.value = Math.min(15, maxQty);
+
+    openModal('claimModal');
+  }
+</script>
+{% endblock %}

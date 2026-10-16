@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}FoodCycle - Predict Better. Waste Less. Feed More.{% endblock %}</title>
+  <meta name="description" content="A circular food ecosystem supporting UN SDG 12: Machine-learning demand forecasting for restaurants and safe surplus food redistribution to verified NGOs.">
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/static/css/style.css">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-link" id="nav-brand">
+        <span class="brand-icon">
+          <i data-lucide="sprout"></i>
+        </span>
+        <span>FoodCycle</span>
+        <span class="brand-tag">SDG 12</span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="/" class="nav-link {% if active_page == 'home' %}active{% endif %}">Home</a></li>
+          <li><a href="/about" class="nav-link {% if active_page == 'about' %}active{% endif %}">About</a></li>
+          <li><a href="/how-it-works" class="nav-link {% if active_page == 'how_it_works' %}active{% endif %}">How It Works</a></li>
+          <li><a href="/marketplace" class="nav-link {% if active_page == 'marketplace' %}active{% endif %}">Surplus Food</a></li>
+          <li><a href="/impact" class="nav-link {% if active_page == 'impact' %}active{% endif %}">Impact</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        {% if current_user %}
+          {% if current_user.account_type == 'restaurant' %}
+            <a href="/restaurant/dashboard" class="btn btn-secondary btn-sm" id="btn-portal-link">
+              <i data-lucide="layout-dashboard"></i> Restaurant Portal
+            </a>
+            <div class="user-pill">
+              <span class="role-badge restaurant">Restaurant</span>
+              <span>{{ current_user.org_name }}</span>
+            </div>
+          {% elif current_user.account_type == 'ngo' %}
+            <a href="/ngo/dashboard" class="btn btn-secondary btn-sm" id="btn-portal-link">
+              <i data-lucide="layout-dashboard"></i> NGO Portal
+            </a>
+            <div class="user-pill">
+              <span class="role-badge ngo">NGO</span>
+              <span>{{ current_user.org_name }}</span>
+            </div>
+          {% endif %}
+          <a href="/logout" class="btn btn-outline btn-sm" id="btn-logout" title="Sign Out">
+            <i data-lucide="log-out"></i> Logout
+          </a>
+        {% else %}
+          <a href="/login" class="btn btn-outline btn-sm" id="btn-login">Log In</a>
+          <a href="/register" class="btn btn-primary btn-sm" id="btn-register">Join Network</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <!-- Flash Alerts -->
+  {% if alert_message %}
+    <div class="main-content" style="padding-bottom: 0;">
+      <div class="alert alert-{{ alert_type or 'info' }}">
+        <span>{{ alert_message }}</span>
+        <button type="button" class="alert-close">&times;</button>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Main Body Content -->
+  <main class="{% block main_class %}main-content{% endblock %}">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div>
+        <div class="brand-link" style="margin-bottom: 0.75rem;">
+          <span class="brand-icon"><i data-lucide="sprout"></i></span>
+          <span>FoodCycle</span>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--color-muted); max-width: 320px; margin-bottom: 1rem;">
+          Predict Better. Waste Less. Feed More. A circular food waste prevention and NGO redistribution platform.
+        </p>
+        <span class="badge badge-forest">
+          <i data-lucide="globe"></i> UN Sustainable Development Goal 12
+        </span>
+      </div>
+
+      <div>
+        <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--color-dark); margin-bottom: 0.75rem;">Platform</h4>
+        <ul style="list-style: none; font-size: 0.88rem; display: flex; flex-direction: column; gap: 0.4rem;">
+          <li><a href="/marketplace">Surplus Food Listings</a></li>
+          <li><a href="/how-it-works">How It Works</a></li>
+          <li><a href="/impact">Impact Metrics</a></li>
+          <li><a href="/about">About UN SDG 12</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--color-dark); margin-bottom: 0.75rem;">Join Network</h4>
+        <ul style="list-style: none; font-size: 0.88rem; display: flex; flex-direction: column; gap: 0.4rem;">
+          <li><a href="/register?role=restaurant">Restaurant Registration</a></li>
+          <li><a href="/register?role=ngo">NGO Partner Registration</a></li>
+          <li><a href="/login">Account Login</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--color-dark); margin-bottom: 0.75rem;">Safety & Standards</h4>
+        <p style="font-size: 0.82rem; color: var(--color-muted); line-height: 1.5;">
+          All food redistributions strictly adhere to food temperature, hygienic packing, and timely collection standards before expiry.
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>&copy; 2026 FoodCycle. Built for sustainable zero-waste communities.</div>
+      <div style="display: flex; gap: 1rem;">
+        <span>Local MongoDB: <code>foodcycle</code></span>
+        <span>Python FastAPI & Scikit-Learn</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/static/js/app.js"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

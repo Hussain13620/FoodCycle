@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}About FoodCycle - UN SDG 12 Sustainable Consumption{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+  <div style="text-align: center; margin-bottom: 3rem;">
+    <span class="badge badge-forest" style="margin-bottom: 0.75rem;">
+      <i data-lucide="leaf"></i> Mission & Vision
+    </span>
+    <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--color-forest); margin-bottom: 1rem;">
+      Responsible Consumption & Production
+    </h1>
+    <p style="font-size: 1.15rem; color: var(--color-muted); max-width: 680px; margin: 0 auto;">
+      Supporting United Nations Sustainable Development Goal 12.3: Halving per capita global food waste by 2030.
+    </p>
+  </div>
+
+  <div class="card" style="margin-bottom: 2rem;">
+    <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--color-forest); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+      <i data-lucide="alert-triangle"></i> The Reality of Food Waste
+    </h2>
+    <p style="margin-bottom: 1rem; color: var(--color-dark); line-height: 1.7;">
+      Globally, approximately <strong>one-third of all food produced</strong> is discarded before it reaches human consumption. In commercial restaurants, kitchens often operate in conditions of high demand uncertainty. Fearing stockouts or customer dissatisfaction, chefs routinely over-prep by 15% to 25%, resulting in thousands of tonnes of safe, edible meals dumped into landfills daily.
+    </p>
+    <p style="color: var(--color-dark); line-height: 1.7;">
+      Meanwhile, millions face food insecurity. Food waste is not merely an economic loss—it produces up to 10% of global greenhouse gas emissions through methane release in decomposing landfills.
+    </p>
+  </div>
+
+  <div class="grid-2" style="margin-bottom: 2rem;">
+    <div class="card">
+      <div class="kpi-icon forest" style="margin-bottom: 1rem;"><i data-lucide="brain"></i></div>
+      <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Targeted Prevention</h3>
+      <p style="font-size: 0.92rem; color: var(--color-muted); line-height: 1.6;">
+        FoodCycle’s predictive intelligence analyzes calendar patterns, Indian festive rushes, and rolling day-of-week demand trends using Scikit-Learn. By providing accurate batch prep recommendations, restaurants prevent overproduction at the source.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="kpi-icon leaf" style="margin-bottom: 1rem;"><i data-lucide="repeat"></i></div>
+      <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Rapid Redistribution</h3>
+      <p style="font-size: 0.92rem; color: var(--color-muted); line-height: 1.6;">
+        Unavoidable daily surplus is instantly published with strict food hygiene timestamps, storage requirements (refrigerated, hot-held), and allergen declarations. Verified NGOs claim partial or full batches with atomic reservation safety.
+      </p>
+    </div>
+  </div>
+
+  <div class="card" style="background: var(--color-beige-light); border-color: var(--color-beige); margin-bottom: 2rem;">
+    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--color-earth-dark); margin-bottom: 0.75rem;">
+      <i data-lucide="shield-check"></i> Strict Food Safety Standards
+    </h3>
+    <p style="font-size: 0.92rem; color: var(--color-dark); line-height: 1.6;">
+      Redistributing food requires uncompromising health standards. FoodCycle mandates temperature disclosures, maximum holding times, and hygiene verification at both pickup and delivery. Expired listings are automatically deactivated, ensuring only fresh, nourishing meals reach humanitarian feeding drives.
+    </p>
+  </div>
+
+  <div style="text-align: center; margin-top: 3rem;">
+    <a href="/how-it-works" class="btn btn-primary btn-lg">
+      See How the System Works <i data-lucide="arrow-right"></i>
+    </a>
+  </div>
+</div>
+{% endblock %}

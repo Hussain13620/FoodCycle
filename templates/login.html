@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - FoodCycle{% endblock %}
+
+{% block content %}
+<div style="max-width: 460px; margin: 2rem auto;">
+  <div class="card" style="box-shadow: var(--shadow-md);">
+    <div style="text-align: center; margin-bottom: 1.5rem;">
+      <div class="brand-icon" style="width: 48px; height: 48px; margin: 0 auto 0.75rem auto;">
+        <i data-lucide="sprout" style="width: 28px; height: 28px;"></i>
+      </div>
+      <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--color-forest);">Sign in to FoodCycle</h2>
+      <p style="font-size: 0.88rem; color: var(--color-muted); margin-top: 0.25rem;">
+        Access your restaurant kitchen or NGO partner dashboard
+      </p>
+    </div>
+
+    <!-- Quick 1-Click Demo Logins for Hackathon Evaluators -->
+    <div style="background: var(--color-beige-light); border: 1px solid var(--color-beige); border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1.5rem;">
+      <div style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--color-earth); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.35rem;">
+        <i data-lucide="sparkles"></i> 1-Click Demo Credentials
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <button type="button" class="btn btn-primary btn-sm" style="flex: 1;" onclick="fillDemoLogin('restaurant')">
+          <i data-lucide="chef-hat"></i> Demo Restaurant
+        </button>
+        <button type="button" class="btn btn-leaf btn-sm" style="flex: 1;" onclick="fillDemoLogin('ngo')">
+          <i data-lucide="heart"></i> Demo NGO
+        </button>
+      </div>
+    </div>
+
+    <form action="/login" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="login-email">Email Address</label>
+        <input type="email" id="login-email" name="email" class="form-control" placeholder="name@organisation.com" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="login-password">Password</label>
+        <input type="password" id="login-password" name="password" class="form-control" placeholder="••••••••" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem;" id="btn-submit-login">
+        <i data-lucide="log-in"></i> Sign In to Dashboard
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.5rem; font-size: 0.88rem; color: var(--color-muted); border-top: 1px solid var(--color-beige-light); padding-top: 1rem;">
+      Don't have an account? <a href="/register" style="font-weight: 600;">Register your organisation</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

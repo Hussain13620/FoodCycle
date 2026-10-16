@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Kitchen Profile & Settings - FoodCycle{% endblock %}
+
+{% block content %}
+<div class="grid-aside">
+  <!-- Sidebar -->
+  <aside class="portal-sidebar">
+    <div style="margin-bottom: 1.25rem;">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-forest);">{{ current_user.org_name }}</h3>
+      <span class="badge badge-forest" style="font-size: 0.72rem; margin-top: 0.25rem;">
+        <i data-lucide="chef-hat"></i> Commercial Kitchen
+      </span>
+    </div>
+
+    <div class="portal-nav-title">Management</div>
+    <ul class="portal-nav-list">
+      <li class="portal-nav-item"><a href="/restaurant/dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/forecast"><i data-lucide="sparkles"></i> Demand Forecast</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/surplus"><i data-lucide="package-plus"></i> Surplus Listings</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/requests"><i data-lucide="inbox"></i> NGO Requests</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/menu"><i data-lucide="utensils"></i> Menu Items</a></li>
+      <li class="portal-nav-item"><a href="/restaurant/sales"><i data-lucide="history"></i> Sales & Prep Log</a></li>
+      <li class="portal-nav-item active"><a href="/restaurant/profile"><i data-lucide="settings"></i> Kitchen Profile</a></li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <section>
+    <div style="margin-bottom: 1.5rem;">
+      <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--color-dark);">Kitchen Profile & Parameters</h1>
+      <p style="font-size: 0.92rem; color: var(--color-muted);">
+        Update your establishment address, contact numbers, and default buffer margins for demand forecasting.
+      </p>
+    </div>
+
+    <div class="card" style="max-width: 720px;">
+      <form action="/restaurant/profile" method="POST">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Establishment Name</label>
+            <input type="text" name="org_name" class="form-control" value="{{ current_user.org_name }}" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email (Account ID)</label>
+            <input type="email" class="form-control" value="{{ current_user.email }}" disabled>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Contact Phone</label>
+            <input type="text" name="contact_phone" class="form-control" value="{{ current_user.contact_phone }}" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Cuisine Style</label>
+            <input type="text" name="cuisine_type" class="form-control" value="{{ current_user.cuisine_type or '' }}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Physical Pickup Address</label>
+          <input type="text" name="address" class="form-control" value="{{ current_user.address }}" required>
+          <div class="form-text">This location is provided to NGOs for scheduled meal pickups.</div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Operating Hours</label>
+            <input type="text" name="operating_hours" class="form-control" value="{{ current_user.operating_hours or '11:00 AM - 11:00 PM' }}">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Default Forecasting Safety Buffer (%)</label>
+            <input type="number" step="1" min="0" max="40" name="safety_margin_pct" class="form-control" value="{{ current_user.safety_margin_pct or 10 }}">
+            <div class="form-text">Buffer percentage applied on predicted customer demand.</div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="check"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+</div>
+{% endblock %}
